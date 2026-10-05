@@ -1,0 +1,17 @@
+// ============================================
+// Configuration du proxy Angular
+// Redirige les requêtes /api vers le backend
+// pour éviter les problèmes de CORS en dev
+// ============================================
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/uploads": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

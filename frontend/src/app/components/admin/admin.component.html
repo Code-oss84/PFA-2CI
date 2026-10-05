@@ -1,0 +1,240 @@
+<!--
+  Tableau de bord administrateur
+-->
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="flex items-center gap-3 mb-8">
+    <div class="h-10 w-10 rounded-xl bg-zinc-900 flex items-center justify-center text-white shadow-sm">
+      <mat-icon class="!text-[20px]">admin_panel_settings</mat-icon>
+    </div>
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-zinc-900">Administration</h1>
+      <p class="text-sm text-zinc-500">Gérez les utilisateurs, les cours et consultez les statistiques</p>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <div class="flex gap-1 mb-6 border-b border-zinc-200">
+    <button
+      type="button"
+      (click)="activeTab = 'users'"
+      class="btn-ghost rounded-none border-b-2 -mb-px transition-colors"
+      [ngClass]="activeTab === 'users' ? 'border-primary-600 text-primary-600 bg-transparent' : 'border-transparent text-zinc-500 hover:text-zinc-900'"
+    >
+      <mat-icon class="!text-[16px]">group</mat-icon>
+      Utilisateurs
+    </button>
+    <button
+      type="button"
+      (click)="activeTab = 'courses'"
+      class="btn-ghost rounded-none border-b-2 -mb-px transition-colors"
+      [ngClass]="activeTab === 'courses' ? 'border-primary-600 text-primary-600 bg-transparent' : 'border-transparent text-zinc-500 hover:text-zinc-900'"
+    >
+      <mat-icon class="!text-[16px]">menu_book</mat-icon>
+      Cours
+    </button>
+    <button
+      type="button"
+      (click)="activeTab = 'stats'"
+      class="btn-ghost rounded-none border-b-2 -mb-px transition-colors"
+      [ngClass]="activeTab === 'stats' ? 'border-primary-600 text-primary-600 bg-transparent' : 'border-transparent text-zinc-500 hover:text-zinc-900'"
+    >
+      <mat-icon class="!text-[16px]">insights</mat-icon>
+      Statistiques
+    </button>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="errorMessage" class="flex items-start gap-3 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-sm animate-fade-in">
+    <mat-icon class="!text-[16px] mt-0.5 shrink-0">error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- === ONGLET UTILISATEURS === -->
+  <div *ngIf="activeTab === 'users'" class="card p-5 animate-fade-in">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-semibold tracking-tight text-zinc-900">Liste des utilisateurs ({{ users.length }})</h2>
+      <span class="badge">{{ users.length }} membres</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-zinc-200 text-zinc-500 text-xs uppercase tracking-wide">
+            <th class="py-3 pr-4 font-medium">ID</th>
+            <th class="py-3 pr-4 font-medium">Nom</th>
+            <th class="py-3 pr-4 font-medium">Email</th>
+            <th class="py-3 pr-4 font-medium">Rôle</th>
+            <th class="py-3 font-medium text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users" class="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
+            <td class="py-3 pr-4 text-sm text-zinc-500">{{ user.id }}</td>
+            <td class="py-3 pr-4 text-sm font-medium text-zinc-900">{{ user.username }}</td>
+            <td class="py-3 pr-4 text-sm text-zinc-600">{{ user.email }}</td>
+            <td class="py-3 pr-4">
+              <span class="badge" [ngClass]="user.role === 'admin' ? 'badge-primary' : ''">
+                <mat-icon class="!text-[12px]" *ngIf="user.role === 'admin'">shield</mat-icon>
+                {{ user.role }}
+              </span>
+            </td>
+            <td class="py-3 text-right">
+              <button (click)="deleteUser(user)" class="inline-flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg px-2.5 py-1.5 transition-colors">
+                <mat-icon class="!text-[14px]">delete_outline</mat-icon>
+                Supprimer
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="5" class="py-10 text-center text-sm text-zinc-400">
+              <mat-icon class="!text-[32px] block mx-auto mb-2 text-zinc-300">group_off</mat-icon>
+              Aucun utilisateur
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- === ONGLET COURS === -->
+  <div *ngIf="activeTab === 'courses'" class="animate-fade-in">
+    <!-- Formulaire de création -->
+    <div class="card p-5 mb-6">
+      <div class="flex items-center gap-2 mb-4">
+        <mat-icon class="!text-[18px] text-primary-500">add_circle_outline</mat-icon>
+        <h2 class="text-base font-semibold tracking-tight text-zinc-900">Créer un nouveau cours</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-medium text-zinc-500 mb-1.5">Titre du cours</label>
+          <input type="text" [(ngModel)]="newCourse.title" class="input-field" placeholder="Titre du cours">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-500 mb-1.5">Catégorie</label>
+          <input type="text" [(ngModel)]="newCourse.category" class="input-field" placeholder="Catégorie">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-zinc-500 mb-1.5">Description</label>
+        <textarea [(ngModel)]="newCourse.description" class="input-field" rows="3" placeholder="Description du cours"></textarea>
+      </div>
+      <div class="flex items-center gap-3">
+        <select [(ngModel)]="newCourse.level" class="input-field w-48">
+          <option value="beginner">Débutant</option>
+          <option value="intermediate">Intermédiaire</option>
+          <option value="advanced">Avancé</option>
+        </select>
+        <button (click)="createCourse()" class="btn-primary" [disabled]="!newCourse.title">
+          <mat-icon class="!text-[16px]">add</mat-icon>
+          Créer le cours
+        </button>
+      </div>
+    </div>
+
+    <!-- Liste des cours -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <mat-icon class="!text-[18px] text-primary-500">menu_book</mat-icon>
+          <h2 class="text-base font-semibold tracking-tight text-zinc-900">Cours existants ({{ courses.length }})</h2>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div *ngFor="let course of courses" class="flex items-center justify-between border border-zinc-200 rounded-xl px-4 py-3 hover:border-zinc-300 hover:bg-zinc-50 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="h-9 w-9 rounded-lg bg-primary-soft flex items-center justify-center shrink-0">
+              <mat-icon class="!text-[16px] text-primary-600">menu_book</mat-icon>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-zinc-900 truncate">{{ course.title }}</p>
+              <p class="text-sm text-zinc-500 flex items-center gap-1">
+                {{ course.category }}
+                <span class="text-zinc-300">·</span>
+                {{ course.lesson_count || 0 }} leçons
+              </p>
+            </div>
+          </div>
+          <button (click)="deleteCourse(course)" class="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg px-2.5 py-1.5 transition-colors">
+            <mat-icon class="!text-[14px]">delete_outline</mat-icon>
+            Supprimer
+          </button>
+        </div>
+        <div *ngIf="courses.length === 0" class="text-center py-10 text-sm text-zinc-400">
+          <mat-icon class="!text-[32px] block mx-auto mb-2 text-zinc-300">library_books</mat-icon>
+          Aucun cours
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === ONGLET STATISTIQUES === -->
+  <div *ngIf="activeTab === 'stats'" class="animate-fade-in">
+    <!-- Cartes de statistiques -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="!text-[16px] text-zinc-400">group</mat-icon>
+          <span class="text-sm text-zinc-500">Utilisateurs</span>
+        </div>
+        <div class="text-3xl font-bold tracking-tight text-zinc-900">{{ stats?.users || 0 }}</div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="!text-[16px] text-zinc-400">menu_book</mat-icon>
+          <span class="text-sm text-zinc-500">Cours</span>
+        </div>
+        <div class="text-3xl font-bold tracking-tight text-zinc-900">{{ stats?.courses || 0 }}</div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="!text-[16px] text-zinc-400">face</mat-icon>
+          <span class="text-sm text-zinc-500">Avatars</span>
+        </div>
+        <div class="text-3xl font-bold tracking-tight text-zinc-900">{{ stats?.avatars || 0 }}</div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="!text-[16px] text-zinc-400">forum</mat-icon>
+          <span class="text-sm text-zinc-500">Conversations</span>
+        </div>
+        <div class="text-3xl font-bold tracking-tight text-zinc-900">{{ stats?.conversations || 0 }}</div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="!text-[16px] text-zinc-400">chat_bubble_outline</mat-icon>
+          <span class="text-sm text-zinc-500">Messages</span>
+        </div>
+        <div class="text-3xl font-bold tracking-tight text-zinc-900">{{ stats?.messages || 0 }}</div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="!text-[16px] text-zinc-400">check_circle_outline</mat-icon>
+          <span class="text-sm text-zinc-500">Leçons terminées</span>
+        </div>
+        <div class="text-3xl font-bold tracking-tight text-zinc-900">{{ stats?.completedLessons || 0 }}</div>
+      </div>
+    </div>
+
+    <!-- Activité récente -->
+    <div class="card p-5">
+      <div class="flex items-center gap-2 mb-4">
+        <mat-icon class="!text-[18px] text-primary-500">history</mat-icon>
+        <h2 class="text-base font-semibold tracking-tight text-zinc-900">Activité récente</h2>
+      </div>
+      <div *ngIf="recentActivity.length === 0" class="text-zinc-400 text-center py-4 text-sm">
+        <mat-icon class="!text-[28px] block mx-auto mb-2 text-zinc-300">inbox</mat-icon>
+        Aucune activité récente
+      </div>
+      <div *ngFor="let activity of recentActivity" class="border-b border-zinc-100 py-3 last:border-0 flex justify-between items-center gap-4">
+        <div class="min-w-0">
+          <p class="text-sm text-zinc-700 truncate">
+            <span class="font-medium text-zinc-900">{{ activity.username }}</span>
+            <span class="text-zinc-300 mx-1">·</span>
+            {{ activity.content }}
+          </p>
+        </div>
+        <span class="text-xs text-zinc-400 shrink-0 whitespace-nowrap">{{ activity.created_at | date:'short' }}</span>
+      </div>
+    </div>
+  </div>
+</div>

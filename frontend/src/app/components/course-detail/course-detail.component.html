@@ -1,0 +1,526 @@
+<!--
+  Détail d'un cours avec les leçons + assistant IA
+  Design : Google Meet (quand le cours est lancé)
+-->
+<!-- ===== PAGE CLASSIQUE (avant de commencer) ===== -->
+<div
+  class="max-w-5xl mx-auto px-4 py-8"
+  [ngClass]="{ 'meet-hidden': lessonStarted }"
+>
+  <button
+    (click)="goBack()"
+    class="btn-ghost !px-0 mb-5 flex items-center gap-1.5"
+  >
+    <i-lucide name="ArrowLeft" class="w-4 h-4"></i-lucide>
+    <span>Retour aux cours</span>
+  </button>
+
+  <div *ngIf="loading" class="text-center py-16">
+    <div
+      class="inline-block animate-spin rounded-full h-9 w-9 border-[3px] border-zinc-200 border-t-primary-500"
+    ></div>
+    <p class="mt-4 text-zinc-500 text-sm">Chargement du cours...</p>
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && course">
+    <div class="card mb-6 !p-6">
+      <div class="flex justify-between items-start flex-wrap gap-4">
+        <div>
+          <h1 class="text-3xl font-bold tracking-tight mb-2">
+            {{ course.title }}
+          </h1>
+          <p class="text-zinc-500">{{ course.description }}</p>
+          <div class="flex items-center space-x-2 mt-3">
+            <span *ngIf="course.category" class="badge badge-primary">{{
+              course.category
+            }}</span>
+            <span class="badge">{{ lessons.length }} leçons</span>
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="relative w-20 h-20">
+            <svg viewBox="0 0 36 36" class="w-20 h-20 -rotate-90">
+              <circle
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                class="stroke-zinc-200"
+                stroke-width="4"
+              ></circle>
+              <circle
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                class="stroke-primary-500 transition-all"
+                stroke-width="4"
+                [attr.stroke-dasharray]="progress + ' 100'"
+                stroke-linecap="round"
+              ></circle>
+            </svg>
+            <div
+              class="absolute inset-0 flex items-center justify-center font-bold text-primary-600 text-lg"
+            >
+              {{ progress }}%
+            </div>
+          </div>
+          <p
+            class="text-xs text-zinc-400 mt-1 uppercase tracking-wide font-medium"
+          >
+            Progression
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="card self-start !p-4">
+        <h2 class="text-base font-bold px-2 pt-1 pb-3">Leçons</h2>
+        <div class="space-y-1.5">
+          <button
+            *ngFor="let lesson of lessons"
+            (click)="selectLesson(lesson)"
+            class="w-full text-left p-3 rounded-xl transition flex items-center justify-between gap-2 border"
+            [ngClass]="
+              isSelected(lesson.id)
+                ? 'bg-primary-50 border-primary-200 text-primary-800'
+                : 'border-transparent hover:bg-zinc-50 hover:border-zinc-100'
+            "
+          >
+            <div class="flex items-center gap-3 min-w-0">
+              <span
+                class="flex items-center justify-center h-8 w-8 rounded-lg shrink-0 text-sm"
+                [ngClass]="
+                  isCompleted(lesson.id)
+                    ? 'bg-emerald-100 text-emerald-600'
+                    : 'bg-zinc-100 text-zinc-500'
+                "
+              >
+                {{ isCompleted(lesson.id) ? "✓" : lesson.order_index }}
+              </span>
+              <div class="min-w-0">
+                <p class="text-sm font-medium truncate">
+                  Leçon {{ lesson.order_index }}
+                </p>
+                <p class="text-xs text-zinc-500 truncate">{{ lesson.title }}</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="card lg:col-span-2">
+        <div *ngIf="currentLesson; else noLesson" class="p-6">
+          <div *ngIf="!lessonStarted" class="text-center py-10 animate-fade-in">
+            <span
+              class="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary-soft text-primary-500 mb-5"
+            >
+              <i-lucide name="Play" class="w-8 h-8"></i-lucide>
+            </span>
+            <h2 class="text-2xl font-bold tracking-tight mb-2 text-zinc-900">
+              Leçon {{ currentLesson.order_index }}
+            </h2>
+            <p class="text-lg font-semibold text-primary-600 mb-3">
+              {{ currentLesson.title }}
+            </p>
+            <p
+              class="text-sm text-zinc-500 max-w-md mx-auto mb-8 leading-relaxed"
+            >
+              Prêt à plonger dans cette leçon ? Lancez le cours : votre
+              professeur IA vous expliquera le contenu et pourra répondre à
+              toutes vos questions.
+            </p>
+            <button
+              (click)="startLesson()"
+              class="btn-primary !px-8 !py-3.5 !text-base font-semibold shadow-lg shadow-primary-500/25"
+            >
+              <i-lucide name="Play" class="w-5 h-5"></i-lucide>
+              <span>Commencer le cours</span>
+            </button>
+            <div class="mt-3 text-xs text-zinc-400">
+              Leçon {{ currentLesson.order_index }} sur {{ lessons.length }}
+            </div>
+          </div>
+        </div>
+        <ng-template #noLesson>
+          <div class="text-center py-16 text-zinc-400">
+            <p>Sélectionnez une leçon pour commencer</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================================
+     MODE GOOGLE MEET — plein écran quand lessonStarted = true
+     ====================================================================== -->
+<div *ngIf="lessonStarted" class="meet-container" [ngClass]="{ 'sidebar-open': sidebarOpen }">
+  <!-- Barre du haut -->
+  <div class="meet-header">
+    <button
+      (click)="stopSpeaking(); lessonStarted = false"
+      class="meet-icon-btn"
+      title="Quitter le cours"
+    >
+      <i-lucide name="ArrowLeft" class="w-5 h-5"></i-lucide>
+    </button>
+    <div class="meet-header-info">
+      <span class="meet-title"
+        >Leçon {{ currentLesson?.order_index }} —
+        {{ currentLesson?.title }}</span
+      >
+      <span class="meet-subtitle-label">Professeur IA</span>
+    </div>
+  </div>
+
+  <!-- Layout principal : panel des leçons à gauche + avatar au centre -->
+  <div class="meet-body">
+    <!-- Sidebar des leçons (à gauche, ouverte/cachée) -->
+    <aside
+      class="meet-lessons-panel"
+      [ngClass]="{ 'meet-sidebar-closed': !sidebarOpen }"
+    >
+      <button
+        class="meet-sidebar-toggle"
+        (click)="sidebarOpen = !sidebarOpen"
+        title="{{ sidebarOpen ? 'Masquer les leçons' : 'Afficher les leçons' }}"
+      >
+        <i-lucide [name]="sidebarOpen ? 'ChevronLeft' : 'List'" class="w-4 h-4"></i-lucide>
+      </button>
+
+      <div class="meet-lessons-header">
+        <i-lucide name="BookOpen" class="w-4 h-4 text-violet-400"></i-lucide>
+        <span class="meet-lessons-title">Leçons du cours</span>
+      </div>
+
+      <div class="meet-lessons-progress">
+        <span class="meet-lessons-progress-text">{{ completedLessons.size }} / {{ lessons.length }}</span>
+        <div class="meet-lessons-progress-bar">
+          <div
+            class="meet-lessons-progress-fill"
+            [style.width.%]="lessons.length ? (completedLessons.size / lessons.length) * 100 : 0"
+          ></div>
+        </div>
+      </div>
+
+      <div class="meet-lessons-list">
+        <button
+          *ngFor="let lesson of lessons"
+          (click)="selectLesson(lesson); startLesson()"
+          class="meet-lesson-item"
+          [ngClass]="{ 'meet-lesson-active': isSelected(lesson.id) }"
+        >
+          <span
+            class="meet-lesson-num"
+            [ngClass]="isCompleted(lesson.id) ? 'meet-lesson-done' : ''"
+          >
+            {{ isCompleted(lesson.id) ? "✓" : lesson.order_index }}
+          </span>
+          <span class="meet-lesson-name">{{ lesson.title }}</span>
+          <i-lucide
+            *ngIf="isSelected(lesson.id)"
+            name="ChevronRight"
+            class="w-3.5 h-3.5 text-violet-400"
+          ></i-lucide>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Bouton rabattable quand la sidebar est cachée -->
+    <button
+      *ngIf="!sidebarOpen"
+      class="meet-sidebar-reveal"
+      (click)="sidebarOpen = true"
+      title="Afficher les leçons"
+    >
+      <i-lucide name="List" class="w-4 h-4"></i-lucide>
+    </button>
+
+    <!-- Zone centrale : Avatar -->
+    <div class="meet-center-wrap">
+      <div class="meet-main flex items-center justify-center">
+        <div class="meet-avatar-wrap w-full">
+          <div
+            class="avatar-ring meet-avatar-ring"
+            [ngClass]="{ 'is-speaking': speaking, 'is-idle': !speaking }"
+          >
+            <svg viewBox="0 0 120 120" class="meet-avatar-svg">
+              <defs>
+                <radialGradient id="bgGrad" cx="50%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#ede9fe" />
+                  <stop offset="100%" stop-color="#ddd6fe" />
+                </radialGradient>
+                <linearGradient id="jacketGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#8b5cf6" />
+                  <stop offset="100%" stop-color="#7c3aed" />
+                </linearGradient>
+                <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#fbd7b5" />
+                  <stop offset="100%" stop-color="#eab486" />
+                </linearGradient>
+                <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#52525b" />
+                  <stop offset="100%" stop-color="#27272a" />
+                </linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="60" fill="url(#bgGrad)" />
+              <path
+                d="M56 70 C 33 68, 27 86, 27 118 L 93 118 C 93 86, 87 68, 64 70 Z"
+                fill="url(#jacketGrad)"
+              />
+              <path
+                d="M52 70 L 60 88 L 68 70"
+                fill="none"
+                stroke="#6d28d9"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path d="M53 76 L 60 100 L 67 76 L 60 79 Z" fill="#ffffff" />
+              <path d="M60 80 L 54 90 L 60 103 L 66 90 Z" fill="#facc15" />
+              <path d="M60 80 L 57.5 86 L 62.5 86 Z" fill="#eab308" />
+              <rect
+                x="50"
+                y="57"
+                width="20"
+                height="13"
+                rx="4"
+                fill="url(#skinGrad)"
+              />
+              <ellipse cx="60" cy="60" rx="19" ry="6" fill="rgba(0,0,0,0.08)" />
+              <circle cx="60" cy="44" r="18" fill="url(#skinGrad)" />
+              <circle cx="41" cy="44" r="4" fill="url(#skinGrad)" />
+              <circle cx="79" cy="44" r="4" fill="url(#skinGrad)" />
+              <path
+                d="M42 42 C 40 24, 50 19, 60 19 C 70 19, 80 24, 78 42 C 78 30, 70 28, 60 28 C 50 28, 42 30, 42 42 Z"
+                fill="url(#hairGrad)"
+              />
+              <path
+                d="M45 30 C 48 24, 55 21, 62 22 C 52 22, 46 26, 44 32 Z"
+                fill="url(#hairGrad)"
+              />
+              <path
+                d="M48 38 Q 51 36, 54 37.5"
+                stroke="#7c5a34"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <path
+                d="M66 37.5 Q 69 36, 72 38"
+                stroke="#7c5a34"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+              />
+              <g>
+                <circle
+                  cx="52.5"
+                  cy="43"
+                  r="6.5"
+                  fill="rgba(245,243,255,0.5)"
+                  stroke="#27272a"
+                  stroke-width="2.2"
+                />
+                <circle
+                  cx="67.5"
+                  cy="43"
+                  r="6.5"
+                  fill="rgba(245,243,255,0.5)"
+                  stroke="#27272a"
+                  stroke-width="2.2"
+                />
+                <path
+                  d="M59 42 L 61 42"
+                  stroke="#27272a"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M46 43 L 40 41"
+                  stroke="#27272a"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M74 43 L 80 41"
+                  stroke="#27272a"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                />
+              </g>
+              <circle cx="52.5" cy="43" r="2.2" fill="#27272a" />
+              <circle cx="67.5" cy="43" r="2.2" fill="#27272a" />
+              <circle cx="53.3" cy="42.2" r="0.8" fill="#ffffff" />
+              <circle cx="68.3" cy="42.2" r="0.8" fill="#ffffff" />
+              <circle cx="47" cy="50" r="3" fill="rgba(244,114,182,0.30)" />
+              <circle cx="73" cy="50" r="3" fill="rgba(244,114,182,0.30)" />
+              <path d="M52 52 Q 60 59, 68 52 Z" fill="#c96f4a" opacity="0.35" />
+              <g
+                [attr.class]="
+                  speaking ? 'avatar-mouth speaking' : 'avatar-mouth'
+                "
+              >
+                <path
+                  d="M53 53 Q 60 58, 67 53"
+                  fill="none"
+                  stroke="#8d4b2d"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                />
+              </g>
+              <circle cx="60" cy="72" r="1.5" fill="#6d28d9" />
+            </svg>
+          </div>
+
+          <div
+            class="absolute -inset-5 flex items-center justify-center pointer-events-none"
+          >
+            <div class="sound-wave" [ngClass]="speaking ? 'wave-active' : ''">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <p class="meet-avatar-name">
+            {{
+              speaking
+                ? "Parle..."
+                : explaining
+                  ? loadingMessage
+                  : isRecording
+                    ? "Vous parlez..."
+                    : "En attente"
+            }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Indicateur de chargement -->
+      <div *ngIf="explaining" class="meet-loading">
+        <i-lucide name="Loader" class="w-4 h-4 meet-loading-icon"></i-lucide>
+        <span>{{ loadingMessage }}</span>
+      </div>
+
+  <!-- Sous-titres synchronisés -->
+  <div class="meet-subtitle-bar">
+    <ng-container
+      *ngIf="
+        aiExplanation && activeSubtitleIndex >= 0 && subtitles.length > 0;
+        else meetAnswerSub
+      "
+    >
+      <p
+        *ngIf="
+          activeSubtitleIndex > 0 && subtitles[activeSubtitleIndex - 1]
+        "
+        class="meet-sub meet-sub-prev"
+      >
+        {{ subtitles[activeSubtitleIndex - 1] }}
+      </p>
+      <p class="meet-sub meet-sub-current">
+        {{ subtitles[activeSubtitleIndex] }}
+      </p>
+    </ng-container>
+    <ng-template #meetAnswerSub>
+      <ng-container
+        *ngIf="
+          aiAnswer && activeSubtitleIndex >= 0 && subtitles.length > 0;
+          else meetIdleSub
+        "
+      >
+        <p
+          *ngIf="
+            activeSubtitleIndex > 0 && subtitles[activeSubtitleIndex - 1]
+          "
+          class="meet-sub meet-sub-prev"
+        >
+          {{ subtitles[activeSubtitleIndex - 1] }}
+        </p>
+        <p class="meet-sub meet-sub-current">
+          {{ subtitles[activeSubtitleIndex] }}
+        </p>
+      </ng-container>
+    </ng-template>
+    <ng-template #meetIdleSub>
+      <p class="meet-sub meet-sub-idle">
+        {{
+          speaking
+            ? "Écoutez le professeur..."
+            : isRecording
+              ? "Posez votre question au professeur..."
+              : "Cliquez sur Écouter pour démarrer."
+        }}
+      </p>
+    </ng-template>
+  </div>
+
+  <!-- Barre d'outils en bas -->
+  <div class="meet-toolbar">
+    <!-- Micro -->
+    <button
+      (click)="toggleMic()"
+      class="meet-tool-btn meet-tool-mic"
+      [ngClass]="{ 'meet-tool-recording': isRecording }"
+      [disabled]="transcribing"
+      title="{{
+        isRecording ? 'Arrêter le micro' : 'Parler au professeur'
+      }}"
+    >
+      <i-lucide
+        [name]="isRecording ? 'MicOff' : 'Mic'"
+        class="w-5 h-5"
+      ></i-lucide>
+      <span class="meet-tool-label">{{
+        isRecording ? "Stop" : "Micro"
+      }}</span>
+    </button>
+
+    <!-- Écouter / Arrêter -->
+    <button
+      (click)="
+        speaking ? stopSpeaking() : speakText(aiExplanation || aiAnswer)
+      "
+      class="meet-tool-btn meet-tool-listen"
+      [ngClass]="{ 'meet-tool-active': speaking }"
+      [disabled]="!aiExplanation && !aiAnswer && !speaking"
+    >
+      <i-lucide
+        [name]="speaking ? 'Square' : 'Volume2'"
+        class="w-5 h-5"
+      ></i-lucide>
+      <span class="meet-tool-label">{{
+        speaking ? "Stop" : "Écouter"
+      }}</span>
+    </button>
+
+    <!-- Terminer la leçon -->
+    <button
+      *ngIf="currentLesson"
+      (click)="completeLesson()"
+      class="meet-tool-btn meet-tool-done"
+      [disabled]="isCompleted(currentLesson.id)"
+      [ngClass]="{ 'meet-tool-done-ok': isCompleted(currentLesson.id) }"
+      title="Terminer la leçon"
+    >
+      <i-lucide
+        [name]="isCompleted(currentLesson.id) ? 'CheckCircle' : 'Check'"
+        class="w-5 h-5"
+      ></i-lucide>
+      <span class="meet-tool-label">{{
+        isCompleted(currentLesson.id) ? "Terminé" : "Terminer"
+      }}</span>
+    </button>
+      </div>
+    </div><!-- /meet-center-wrap -->
+  </div><!-- /meet-body -->
+
+</div><!-- /meet-container -->

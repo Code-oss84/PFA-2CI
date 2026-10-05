@@ -1,0 +1,59 @@
+<div class="mx-auto max-w-7xl px-4 py-10">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-900">Mes cours</h1>
+    <p class="mt-1 text-sm text-zinc-500">Parcourez les cours et continuez votre apprentissage</p>
+  </div>
+
+  <div class="mb-8 flex flex-wrap gap-2">
+    <button
+      *ngFor="let cat of getCategories()"
+      (click)="filterByCategory(cat)"
+      class="inline-flex items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-200"
+      [ngClass]="selectedCategory === cat
+        ? 'bg-zinc-900 text-white'
+        : 'border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'"
+    >
+      {{ cat }}
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="loading" class="py-20 text-center">
+    <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-zinc-900"></div>
+    <p class="mt-4 text-sm text-zinc-500">Chargement des cours...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <div *ngIf="filteredCourses.length === 0" class="py-20 text-center">
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100">
+        <mat-icon class="text-zinc-400">menu_book</mat-icon>
+      </div>
+      <p class="mt-4 text-sm text-zinc-500">Aucun cours dans cette catégorie</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 animate-fade-in sm:grid-cols-2 lg:grid-cols-3">
+      <div *ngFor="let course of filteredCourses" class="card cursor-pointer overflow-hidden p-4 transition" [routerLink]="['/courses', course.id]">
+        <div class="mb-4 flex h-40 items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100">
+          <img *ngIf="course.image_url" [src]="course.image_url" class="h-full w-full object-cover" alt="{{ course.title }}">
+          <mat-icon *ngIf="!course.image_url" class="text-5xl text-zinc-300">menu_book</mat-icon>
+        </div>
+
+        <h3 class="mb-2 text-base font-semibold tracking-tight text-zinc-900">{{ course.title }}</h3>
+        <p class="mb-3 line-clamp-2 text-sm text-zinc-500">{{ course.description }}</p>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span *ngIf="course.category" class="badge badge-primary">{{ course.category }}</span>
+            <span class="rounded-full px-2.5 py-1 text-xs font-medium" [ngClass]="getLevelColor(course.level)">
+              {{ getLevelLabel(course.level) }}
+            </span>
+          </div>
+          <span class="text-xs text-zinc-400">{{ course.lesson_count || 0 }} leçons</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

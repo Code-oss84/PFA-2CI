@@ -1,0 +1,89 @@
+# ============================================
+# Docker Compose - EduAvatar
+# Orchestre les 3 services :
+#   - db       : PostgreSQL (base de données)
+#   - backend  : Node.js Express (API)
+#   - frontend : Angular + nginx (interface)
+#
+# Usage :
+#   docker-compose up --build -d    (démarrer)
+#   docker-compose down             (arrêter)
+# ============================================
+
+services:
+  # === PostgreSQL ===
+  db:
+    image: postgres:16-alpine
+    container_name: eduvatar-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-eduvatar}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eduvatar123}
+      POSTGRES_DB: ${POSTGRES_DB:-eduvatar}
+    ports:
+      - "5432:5432"   # Expose PostgreSQL sur le port 5432
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Persistance des données
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-eduvatar}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # === Backend Node.js ===
+  backend:
+    build: ./backend
+    container_name: eduvatar-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy  # Attend que la base soit prête
+    environment:
+      # Variables d'environnement pour le backend
+      PORT: 3000
+      NODE_ENV: production
+      # Connexion à PostgreSQL DANS le réseau Docker
+      DB_HOST: db                  # Nom du service Docker
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-eduvatar}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-eduvatar123}
+      DB_NAME: ${POSTGRES_DB:-eduvatar}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET:-changez-moi-cette-cle-secrete}
+      JWT_EXPIRES_IN: 7d
+      # LLM : Ollama (local, prioritaire) + Groq (repli)
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1/chat/completions}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-120b}
+      HF_API_KEY: ${HF_API_KEY:-}
+      HF_WHISPER_MODEL: ${HF_WHISPER_MODEL:-openai/whisper-large-v3}
+      GROQ_WHISPER_MODEL: ${GROQ_WHISPER_MODEL:-whisper-large-v3}
+      EDGE_TTS_VOICE: ${EDGE_TTS_VOICE:-fr-FR-DeniseNeural}
+      SADTALKER_API_URL: ${SADTALKER_API_URL:-}
+      # CORS pour le frontend
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4200}
+    # Permet au conteneur d'accéder à Ollama (machine hôte) via host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "3000:3000"   # Expose l'API sur le port 3000
+    volumes:
+      - uploads_data:/app/uploads  # Persistance des fichiers uploadés
+
+  # === Frontend Angular ===
+  frontend:
+    build: ./frontend
+    container_name: eduvatar-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"   # Expose le frontend sur le port 4200
+    environment:
+      API_URL: http://localhost:3000/api
+
+# === Volumes Docker (persistance des données) ===
+volumes:
+  db_data:
+  uploads_data:

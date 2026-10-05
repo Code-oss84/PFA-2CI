@@ -1,0 +1,147 @@
+<nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-200/60 shadow-[0_1px_3px_rgba(16,16,16,0.04)]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+
+      <!-- Logo -->
+      <a routerLink="/dashboard" class="flex items-center gap-2.5 shrink-0 group">
+        <span class="relative flex items-center justify-center h-9 w-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md shadow-violet-500/30 transition-transform group-hover:scale-105">
+          <mat-icon class="!text-[18px]">school</mat-icon>
+        </span>
+        <span class="leading-none">
+          <span class="block text-lg font-bold tracking-tight text-zinc-900">EduAvatar</span>
+          <span class="block text-[10px] font-medium uppercase tracking-widest text-zinc-400">Assistant pédagogique</span>
+        </span>
+      </a>
+
+      <!-- Liens de navigation (desktop) -->
+      <div *ngIf="isAuthenticated()" class="hidden md:flex items-center gap-0.5 ml-6">
+        <a routerLink="/dashboard" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           [routerLinkActiveOptions]="{ exact: true }"
+           class="nav-item">
+          <mat-icon class="text-[16px]">space_dashboard</mat-icon>
+          <span>Tableau de bord</span>
+        </a>
+        <a routerLink="/courses" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item">
+          <mat-icon class="text-[16px]">menu_book</mat-icon>
+          <span>Cours</span>
+        </a>
+        <a *ngIf="isAdmin()" routerLink="/avatar-creator" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item">
+          <mat-icon class="text-[16px]">face</mat-icon>
+          <span>Avatars</span>
+        </a>
+        <a routerLink="/chat" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item">
+          <mat-icon class="text-[16px]">forum</mat-icon>
+          <span>Chat</span>
+        </a>
+        <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item">
+          <mat-icon class="text-[16px]">admin_panel_settings</mat-icon>
+          <span>Admin</span>
+        </a>
+      </div>
+
+      <!-- Actions à droite -->
+      <div class="flex items-center gap-2.5">
+        <!-- Séparateur quand connecté -->
+        <div *ngIf="isAuthenticated()" class="hidden sm:block h-6 w-px bg-zinc-200 mr-1"></div>
+
+        <ng-container *ngIf="isAuthenticated(); else loginButton">
+          <!-- Avatar bouton + menu profil -->
+          <div class="relative">
+            <button mat-button [matMenuTriggerFor]="userMenu"
+                    class="!rounded-full !p-[2px] !min-w-0 flex items-center justify-center bg-gradient-to-br from-violet-500 to-fuchsia-500 hover:brightness-110 transition-all shadow-sm shadow-violet-500/25 group/avatar">
+              <span class="flex items-center justify-center h-8 w-8 rounded-full bg-white/15 text-white text-sm font-semibold">
+                {{ user?.username?.charAt(0)?.toUpperCase() }}
+              </span>
+              <!-- Indicateur de présence -->
+              <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+            </button>
+            <mat-menu #userMenu="matMenu" class="!rounded-xl !border !border-zinc-200 !mt-1 !shadow-xl">
+              <div class="px-4 py-3 border-b border-zinc-100 min-w-[220px]">
+                <p class="text-sm font-semibold text-zinc-900 tracking-tight">{{ user?.username }}</p>
+                <p class="text-xs text-zinc-400 break-all">{{ user?.email }}</p>
+                <span *ngIf="isAdmin()" class="inline-flex mt-1.5 items-center gap-1 px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 text-[10px] font-semibold uppercase tracking-wide">
+                  <mat-icon class="!text-[12px]">shield</mat-icon> Administrateur
+                </span>
+              </div>
+              <button mat-menu-item routerLink="/profile" class="!text-sm !font-medium">
+                <mat-icon class="!text-zinc-400">person</mat-icon>
+                <span>Mon profil</span>
+              </button>
+              <div class="my-1 border-t border-zinc-100"></div>
+              <button mat-menu-item (click)="logout()" class="!text-sm !font-medium !text-red-500">
+                <mat-icon>logout</mat-icon>
+                <span>Déconnexion</span>
+              </button>
+            </mat-menu>
+          </div>
+          <!-- Toggle mobile -->
+          <button (click)="toggleMobileMenu()"
+                  class="md:hidden btn-ghost !p-1.5 !rounded-lg">
+            <mat-icon class="!text-xl">{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+          </button>
+        </ng-container>
+
+        <ng-template #loginButton>
+          <a routerLink="/login" class="btn-primary text-sm !px-4 !py-2">Connexion</a>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Menu mobile -->
+    <div *ngIf="mobileMenuOpen && isAuthenticated()" class="mobile-menu md:hidden">
+      <div class="pt-3 pb-3 space-y-1">
+        <a routerLink="/dashboard" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           [routerLinkActiveOptions]="{ exact: true }"
+           class="nav-item w-full !py-2.5">
+          <mat-icon class="text-[18px]">space_dashboard</mat-icon>
+          <span>Tableau de bord</span>
+        </a>
+        <a routerLink="/courses" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item w-full !py-2.5 nav-item-mobile">
+          <mat-icon class="text-[18px]">menu_book</mat-icon>
+          <span>Cours</span>
+        </a>
+        <a *ngIf="isAdmin()" routerLink="/avatar-creator" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item w-full !py-2.5 nav-item-mobile">
+          <mat-icon class="text-[18px]">face</mat-icon>
+          <span>Avatars</span>
+        </a>
+        <a routerLink="/chat" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item w-full !py-2.5 nav-item-mobile">
+          <mat-icon class="text-[18px]">forum</mat-icon>
+          <span>Chat</span>
+        </a>
+        <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="nav-active bg-violet-50 text-violet-700"
+           class="nav-item w-full !py-2.5 nav-item-mobile">
+          <mat-icon class="text-[18px]">admin_panel_settings</mat-icon>
+          <span>Admin</span>
+        </a>
+
+        <!-- Footer du menu mobile : profil + déconnexion -->
+        <div class="mt-2 pt-3 border-t border-zinc-100">
+          <div class="flex items-center gap-3 px-3 pb-2">
+            <span class="flex items-center justify-center h-9 w-9 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white text-sm font-semibold">
+              {{ user?.username?.charAt(0)?.toUpperCase() }}
+            </span>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-zinc-900 tracking-tight truncate">{{ user?.username }}</p>
+              <p class="text-xs text-zinc-400 truncate">{{ user?.email }}</p>
+            </div>
+          </div>
+          <a routerLink="/profile" class="nav-item w-full !py-2.5">
+            <mat-icon class="text-[18px]">person</mat-icon>
+            <span>Mon profil</span>
+          </a>
+          <button (click)="logout()" class="nav-item w-full !py-2.5 !text-red-500">
+            <mat-icon class="text-[18px]">logout</mat-icon>
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

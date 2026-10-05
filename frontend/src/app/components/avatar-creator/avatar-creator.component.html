@@ -1,0 +1,160 @@
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-800">Créer mon avatar</h1>
+    <p class="text-sm text-zinc-400 mt-1">Importez une photo pour générer un avatar interactif.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- === Formulaire de création === -->
+    <div class="card p-6 space-y-5 animate-fade-in">
+      <h2 class="text-sm font-semibold tracking-tight text-zinc-800">Nouvel avatar</h2>
+
+      <!-- Zone d'upload -->
+      <div
+        class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors duration-200"
+        [ngClass]="imagePreview
+          ? 'border-primary-300 bg-primary-50/30'
+          : 'border-zinc-200 hover:border-primary-400 hover:bg-zinc-50'"
+        (click)="fileInput.click()"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event)"
+      >
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          class="hidden"
+          (change)="onFileSelected($event)"
+        >
+        <div *ngIf="!imagePreview" class="space-y-2">
+          <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center mx-auto">
+            <mat-icon class="text-[22px] text-zinc-400">cloud_upload</mat-icon>
+          </div>
+          <p class="text-sm text-zinc-500">Cliquez ou déposez une photo ici</p>
+          <p class="text-[11px] text-zinc-400">JPG, PNG, GIF ou WEBP — max 10 Mo</p>
+        </div>
+        <img *ngIf="imagePreview" [src]="imagePreview" class="max-h-48 mx-auto rounded-lg object-cover" alt="Aperçu">
+      </div>
+
+      <!-- Nom -->
+      <div>
+        <label class="block text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1.5">Nom de l'avatar</label>
+        <input
+          type="text"
+          [(ngModel)]="avatarName"
+          class="input-field"
+          placeholder="Ex : Professeur Malik"
+        >
+      </div>
+
+      <!-- Messages d'état -->
+      <div *ngIf="errorMessage" class="flex items-start gap-2 bg-red-50 border border-red-200 text-red-600 px-3.5 py-2.5 rounded-xl text-xs">
+        <mat-icon class="text-[16px] mt-0.5 shrink-0">error_outline</mat-icon>
+        {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="flex items-start gap-2 bg-emerald-50 border border-emerald-200 text-emerald-600 px-3.5 py-2.5 rounded-xl text-xs">
+        <mat-icon class="text-[16px] mt-0.5 shrink-0">check_circle</mat-icon>
+        {{ successMessage }}
+      </div>
+
+      <!-- Bouton créer -->
+      <button
+        (click)="createAvatar()"
+        class="btn-primary w-full"
+        [disabled]="creating"
+      >
+        <mat-icon class="text-[18px]" *ngIf="!creating">add</mat-icon>
+        <mat-icon class="text-[18px] animate-spin" *ngIf="creating">hourglass_empty</mat-icon>
+        {{ creating ? 'Création en cours…' : 'Créer l\'avatar' }}
+      </button>
+    </div>
+
+    <!-- === Liste des avatars existants === -->
+    <div class="card p-6">
+      <h2 class="text-sm font-semibold tracking-tight text-zinc-800 mb-4">
+        Mes avatars
+        <span class="badge ml-2">{{ avatars.length }}</span>
+      </h2>
+
+      <div *ngIf="avatars.length === 0" class="text-center py-12 text-zinc-400">
+        <mat-icon class="text-[40px] block mx-auto mb-2 text-zinc-300">person_outline</mat-icon>
+        <p class="text-sm">Vous n'avez pas encore d'avatar</p>
+        <p class="text-[11px] mt-1 text-zinc-300">Créez votre premier avatar avec une photo</p>
+      </div>
+
+      <div class="space-y-3">
+        <div *ngFor="let avatar of avatars" class="border border-zinc-200 rounded-xl p-4 hover:shadow-sm transition-shadow">
+          <div class="flex items-center gap-4">
+            <img
+              [src]="getImageUrl(avatar.source_image)"
+              class="w-14 h-14 rounded-xl object-cover shrink-0 border border-zinc-100"
+              alt="{{ avatar.name }}"
+            >
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-zinc-800 truncate">{{ avatar.name }}</p>
+              <div class="mt-1.5">
+                <span *ngIf="avatar.status === 'ready'" class="badge-success inline-flex items-center gap-1 text-[11px]">
+                  <mat-icon class="text-[12px]">check_circle</mat-icon> Prêt
+                </span>
+                <span *ngIf="avatar.status === 'pending'" class="badge inline-flex items-center gap-1 text-[11px]">
+                  <mat-icon class="text-[12px]">schedule</mat-icon> En attente
+                </span>
+                <span *ngIf="avatar.status === 'processing'" class="badge inline-flex items-center gap-1 text-[11px]">
+                  <mat-icon class="text-[12px]">autorenew</mat-icon> Génération…
+                </span>
+                <span *ngIf="avatar.status === 'error'" class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-200">
+                  <mat-icon class="text-[12px]">error</mat-icon> Erreur
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vidéo -->
+          <div *ngIf="avatar.video_url" class="mt-3">
+            <video [src]="getImageUrl(avatar.video_url)" controls class="w-full rounded-lg border border-zinc-200"></video>
+          </div>
+
+          <div class="mt-3 flex justify-end">
+            <button
+              (click)="deleteAvatar(avatar)"
+              class="text-zinc-400 hover:text-red-500 text-xs font-medium inline-flex items-center gap-1 transition-colors"
+            >
+              <mat-icon class="text-[14px]">delete_outline</mat-icon>
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Section génération vocale === -->
+  <div class="card mt-6 p-6">
+    <h2 class="text-sm font-semibold tracking-tight text-zinc-800 mb-4 flex items-center gap-2">
+      <mat-icon class="text-[18px] text-primary-500">record_voice_over</mat-icon>
+      Faire parler mon avatar
+    </h2>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <textarea
+        [(ngModel)]="speechText"
+        class="input-field flex-1 resize-none"
+        rows="3"
+        placeholder="Entrez le texte que votre avatar doit prononcer…"
+      ></textarea>
+      <button
+        (click)="generateSpeech(avatars[0])"
+        class="btn-primary h-fit shrink-0"
+        [disabled]="avatars.length === 0"
+      >
+        <mat-icon class="text-[18px]">videocam</mat-icon>
+        Générer la vidéo
+      </button>
+    </div>
+    <p *ngIf="avatars.length === 0" class="text-xs text-zinc-400 mt-2 flex items-center gap-1">
+      <mat-icon class="text-[14px]">info_outline</mat-icon>
+      Créez d'abord un avatar pour utiliser la génération vocale
+    </p>
+  </div>
+</div>

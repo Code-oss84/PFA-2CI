@@ -1,0 +1,116 @@
+<div class="mx-auto max-w-7xl px-4 py-10">
+  <div class="glass-card mb-8 flex flex-wrap items-center justify-between gap-4 p-6">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-zinc-900">Bonjour, {{ user?.username }} !</h1>
+      <p class="mt-1 text-sm text-zinc-500">Continuez votre apprentissage avec votre avatar personnel</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="py-20 text-center">
+    <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-zinc-900"></div>
+    <p class="mt-4 text-sm text-zinc-500">Chargement...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <div class="mb-8 grid grid-cols-1 gap-6 animate-fade-in sm:grid-cols-2 lg:grid-cols-4">
+      <div class="card p-5">
+        <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100">
+          <mat-icon class="text-zinc-700">forum</mat-icon>
+        </div>
+        <div class="text-2xl font-bold tracking-tight text-zinc-900">{{ stats?.conversations || 0 }}</div>
+        <div class="mt-1 text-sm text-zinc-500">Conversations</div>
+      </div>
+      <div class="card p-5">
+        <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100">
+          <mat-icon class="text-zinc-700">chat_bubble_outline</mat-icon>
+        </div>
+        <div class="text-2xl font-bold tracking-tight text-zinc-900">{{ stats?.messages || 0 }}</div>
+        <div class="mt-1 text-sm text-zinc-500">Messages échangés</div>
+      </div>
+      <div class="card p-5">
+        <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100">
+          <mat-icon class="text-zinc-700">face</mat-icon>
+        </div>
+        <div class="text-2xl font-bold tracking-tight text-zinc-900">{{ stats?.avatars || 0 }}</div>
+        <div class="mt-1 text-sm text-zinc-500">Avatars créés</div>
+      </div>
+      <div class="card p-5">
+        <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100">
+          <mat-icon class="text-zinc-700">check_circle_outline</mat-icon>
+        </div>
+        <div class="text-2xl font-bold tracking-tight text-zinc-900">{{ stats?.completedLessons || 0 }}</div>
+        <div class="mt-1 text-sm text-zinc-500">Leçons terminées</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div class="card p-6">
+        <div class="mb-5 flex items-center justify-between">
+          <h2 class="text-lg font-semibold tracking-tight text-zinc-900">Cours disponibles</h2>
+          <button (click)="goToCourses()" class="btn-ghost text-sm">Voir tout</button>
+        </div>
+
+        <div *ngIf="courses.length === 0" class="py-8 text-center text-sm text-zinc-500">
+          Aucun cours disponible pour le moment
+        </div>
+
+        <div *ngFor="let course of courses" class="flex items-center justify-between border-b border-zinc-100 py-3.5 last:border-0">
+          <div>
+            <p class="font-medium text-zinc-900">{{ course.title }}</p>
+            <div class="mt-1 flex items-center gap-2">
+              <span class="badge badge-primary">{{ course.category }}</span>
+              <span class="text-xs text-zinc-400">{{ course.lesson_count || 0 }} leçons</span>
+            </div>
+          </div>
+          <a [routerLink]="['/courses', course.id]" class="text-zinc-400 transition hover:text-zinc-900">
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <h2 class="mb-5 text-lg font-semibold tracking-tight text-zinc-900">Actions rapides</h2>
+        <div class="space-y-3">
+          <button (click)="goToChat()" class="group flex w-full items-center justify-between rounded-xl border border-zinc-200 bg-white p-4 text-left transition hover:bg-zinc-50">
+            <div class="flex items-center gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100">
+                <mat-icon class="text-zinc-700">smart_toy</mat-icon>
+              </span>
+              <div>
+                <p class="text-sm font-semibold text-zinc-900">Démarrer une conversation</p>
+                <p class="text-xs text-zinc-500">Discutez avec votre avatar</p>
+              </div>
+            </div>
+            <mat-icon class="text-zinc-400 transition group-hover:text-zinc-900">arrow_forward</mat-icon>
+          </button>
+
+          <button (click)="goToCourses()" class="group flex w-full items-center justify-between rounded-xl border border-zinc-200 bg-white p-4 text-left transition hover:bg-zinc-50">
+            <div class="flex items-center gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100">
+                <mat-icon class="text-zinc-700">school</mat-icon>
+              </span>
+              <div>
+                <p class="text-sm font-semibold text-zinc-900">Explorer les cours</p>
+                <p class="text-xs text-zinc-500">Continuez votre apprentissage</p>
+              </div>
+            </div>
+            <mat-icon class="text-zinc-400 transition group-hover:text-zinc-900">arrow_forward</mat-icon>
+          </button>
+
+          <button *ngIf="user?.role === 'admin'" (click)="goToAvatarCreator()" class="group flex w-full items-center justify-between rounded-xl border border-zinc-200 bg-white p-4 text-left transition hover:bg-zinc-50">
+            <div class="flex items-center gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100">
+                <mat-icon class="text-zinc-700">face</mat-icon>
+              </span>
+              <div>
+                <p class="text-sm font-semibold text-zinc-900">Créer un avatar</p>
+                <p class="text-xs text-zinc-500">Téléversez une photo</p>
+              </div>
+            </div>
+            <mat-icon class="text-zinc-400 transition group-hover:text-zinc-900">arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

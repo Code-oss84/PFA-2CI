@@ -1,0 +1,59 @@
+<div class="max-w-lg mx-auto px-4 py-10">
+  <div class="card p-8 animate-fade-in">
+
+    <!-- En-tête profil -->
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-16 h-16 rounded-full bg-violet-500 text-white flex items-center justify-center text-xl font-bold shrink-0">
+        {{ user?.username?.charAt(0)?.toUpperCase() }}
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-zinc-900">{{ user?.username }}</h1>
+        <span class="badge badge-primary mt-1">
+          <mat-icon class="!text-[12px]">{{ user?.role === 'admin' ? 'shield' : 'school' }}</mat-icon>
+          {{ user?.role === 'admin' ? 'Administrateur' : 'Étudiant' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Formulaire -->
+    <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="space-y-5">
+      <div>
+        <label class="block text-xs font-medium text-zinc-500 mb-1.5">Nom d'utilisateur</label>
+        <input type="text" formControlName="username" class="input-field">
+        <div *ngIf="f['username'].touched && f['username'].errors" class="flex items-center gap-1 text-red-500 text-xs mt-1.5">
+          <mat-icon class="!text-[14px]">info</mat-icon>
+          <span *ngIf="f['username'].errors['required']">Le nom est requis</span>
+          <span *ngIf="f['username'].errors['minlength']">Minimum 3 caractères</span>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-zinc-500 mb-1.5">Email</label>
+        <input type="email" formControlName="email" class="input-field">
+        <div *ngIf="f['email'].touched && f['email'].errors" class="flex items-center gap-1 text-red-500 text-xs mt-1.5">
+          <mat-icon class="!text-[14px]">info</mat-icon>
+          <span *ngIf="f['email'].errors['required']">L'email est requis</span>
+          <span *ngIf="f['email'].errors['email']">Email invalide</span>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="successMessage"
+           class="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+        <mat-icon class="!text-[18px]">check_circle</mat-icon>
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage"
+           class="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+        <mat-icon class="!text-[18px]">error</mat-icon>
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-primary w-full text-sm"
+              [disabled]="loading || profileForm.invalid">
+        <mat-icon *ngIf="loading" class="!text-[18px] animate-spin">refresh</mat-icon>
+        {{ loading ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+/* Styles de la barre de navigation */
+
+/* Menu mobile : animation d'ouverture fluide */
+.mobile-menu {
+  animation: mobileMenuIn 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  border-top: 1px solid #f4f4f5;
+}
+
+/* Dialogue d'ouverture : le menu glisse depuis le haut et apparaît */
+@keyframes mobileMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Les items apparaissent en légère cascade (décalage progressif) */
+.nav-item-mobile {
+  animation: mobileItemIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.nav-item-mobile:nth-child(1) { animation-delay: 0.02s; }
+.nav-item-mobile:nth-child(2) { animation-delay: 0.06s; }
+.nav-item-mobile:nth-child(3) { animation-delay: 0.10s; }
+.nav-item-mobile:nth-child(4) { animation-delay: 0.14s; }
+.nav-item-mobile:nth-child(5) { animation-delay: 0.18s; }
+
+@keyframes mobileItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Item de navigation (lien avec icône) + état actif */
+.nav-item {
+  @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 transition-colors duration-150;
+}
+
+.nav-item:hover {
+  @apply text-zinc-900 bg-zinc-100/70;
+}
+
+.nav-active {
+  @apply text-violet-700 font-semibold;
+}
+
+.nav-active:hover {
+  @apply bg-violet-50 text-violet-700;
+}

@@ -1,0 +1,36 @@
+{
+  "name": "eduvatar-backend",
+  "version": "1.0.0",
+  "description": "Backend Node.js + Express pour EduAvatar - Système d'assistant pédagogique avec avatar parlant",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "seed": "node src/seed.js"
+  },
+  "keywords": [
+    "eduvatar",
+    "pfa",
+    "education",
+    "avatar",
+    "ai"
+  ],
+  "author": "EduAvatar",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "form-data": "^4.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "msedge-tts": "^2.0.7",
+    "multer": "^2.3.0",
+    "node-fetch": "^2.7.0",
+    "pg": "^8.11.5",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
