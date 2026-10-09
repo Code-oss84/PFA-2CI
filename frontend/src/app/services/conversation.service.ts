@@ -34,9 +34,4 @@ export class ConversationService {
   sendMessage(conversationId: number, content: string, useVoice: boolean = true): Observable<any> {
     return this.api.post(`/conversations/${conversationId}/messages`, { content, useVoice });
   }
-
-  // === SUPPRIMER UNE CONVERSATION ===
-  deleteConversation(id: number): Observable<any> {
-    return this.api.delete(`/conversations/${id}`);
-  }
 }

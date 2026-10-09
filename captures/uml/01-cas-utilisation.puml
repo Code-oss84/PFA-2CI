@@ -1,0 +1,37 @@
+@startuml cas-utilisation
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+actor "Visiteur" as V
+actor "Apprenant" as A
+actor "Administrateur" as AD
+rectangle "EduAvatar" {
+  usecase "S'inscrire / Se connecter" as UC1
+  usecase "Consulter les cours" as UC2
+  usecase "Consulter une leçon" as UC3
+  usecase "Poser une question à l'IA" as UC4
+  usecase "Poser une question vocale" as UC5
+  usecase "Écouter la réponse (TTS)" as UC6
+  usecase "Créer un avatar" as UC7
+  usecase "Générer un avatar parlant" as UC8
+  usecase "Marquer une leçon terminée" as UC9
+  usecase "Gérer les cours et leçons" as UC10
+  usecase "Gérer les utilisateurs" as UC11
+  usecase "Consulter les statistiques" as UC12
+}
+V --> UC1
+A --> UC2
+A --> UC3
+A --> UC4
+A --> UC5
+A --> UC6
+A --> UC7
+A --> UC8
+A --> UC9
+AD --> UC10
+AD --> UC11
+AD --> UC12
+UC4 ..> UC6 : <<include>>
+UC5 ..> UC6 : <<include>>
+UC8 ..> UC6 : <<include>>
+@enduml

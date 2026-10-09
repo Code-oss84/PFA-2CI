@@ -1,0 +1,65 @@
+@startuml diagramme-classes
+skinparam classAttributeIconSize 0
+hide circle
+class User {
+  +id : int
+  +username : string
+  +email : string
+  +password : string
+  +role : string
+  +picture : string
+  +created_at : datetime
+}
+class Course {
+  +id : int
+  +title : string
+  +description : text
+  +level : string
+  +category : string
+  +created_by : int
+}
+class Lesson {
+  +id : int
+  +course_id : int
+  +title : string
+  +content : text
+  +order_index : int
+}
+class Avatar {
+  +id : int
+  +user_id : int
+  +name : string
+  +source_image : string
+  +video_url : string
+}
+class Conversation {
+  +id : int
+  +user_id : int
+  +avatar_id : int
+  +course_id : int
+  +created_at : datetime
+}
+class Message {
+  +id : int
+  +conversation_id : int
+  +role : string
+  +content : text
+  +created_at : datetime
+}
+class Progress {
+  +id : int
+  +user_id : int
+  +lesson_id : int
+  +completed : boolean
+  +updated_at : datetime
+}
+User "1" --> "*" Course : crée
+Course "1" --> "*" Lesson : contient
+User "1" --> "*" Avatar : possède
+User "1" --> "*" Conversation : initie
+Avatar "1" --> "*" Conversation : anime
+Course "1" --> "*" Conversation : porte sur
+Conversation "1" --> "*" Message : contient
+User "1" --> "*" Progress : réalise
+Lesson "1" --> "*" Progress : concerne
+@enduml

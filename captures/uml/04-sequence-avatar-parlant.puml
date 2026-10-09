@@ -1,0 +1,18 @@
+@startuml sequence-avatar-parlant
+autonumber
+actor Apprenant
+participant "Frontend\nAngular" as FE
+participant "API Express" as API
+participant "Edge TTS" as TTS
+participant "SadTalker\n(Colab / ngrok)" as ST
+database "uploads/videos" as FS
+Apprenant -> FE : texte + photo de l'avatar
+FE -> API : POST /api/avatars/:id/generate
+API -> TTS : synthèse vocale (texte -> MP3)
+TTS --> API : fichier audio MP3
+API -> ST : POST /generate (image + audio)
+ST --> API : vidéo MP4 générée
+API -> FS : sauvegarde de la vidéo
+API --> FE : URL de la vidéo
+FE -> Apprenant : lecture de l'avatar parlant
+@enduml

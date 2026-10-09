@@ -30,8 +30,6 @@ export class AdminComponent implements OnInit {
   stats: any = null;
   recentActivity: any[] = [];
 
-  // Chargement
-  loading = true;
   // Erreur
   errorMessage = '';
 
@@ -53,11 +51,9 @@ export class AdminComponent implements OnInit {
     this.api.get<{ users: User[] }>('/users').subscribe({
       next: (res) => {
         this.users = res.users;
-        this.loading = false;
       },
       error: (err: any) => {
         this.errorMessage = err.message || 'Erreur lors du chargement des utilisateurs';
-        this.loading = false;
       }
     });
   }

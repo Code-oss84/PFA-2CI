@@ -1,0 +1,23 @@
+@startuml sequence-question-vocale
+autonumber
+actor Apprenant
+participant "Frontend\nAngular" as FE
+participant "API Express" as API
+participant "Whisper\n(Groq / HF)" as W
+participant "LLM Groq\n(LLaMA)" as LLM
+participant "Edge TTS" as TTS
+Apprenant -> FE : enregistre la question au micro
+FE -> API : POST /api/ai/transcribe (audio)
+API -> W : transcription audio -> texte
+W --> API : texte transcrit
+API --> FE : texte
+FE -> API : POST /api/ai/ask { question }
+API -> LLM : génération de la réponse
+LLM --> API : réponse pédagogique
+API --> FE : answer
+FE -> API : POST /api/ai/speak-sentences
+API -> TTS : synthèse vocale par phrase
+TTS --> API : URLs audio + phrases
+API --> FE : audios + sous-titres
+FE -> Apprenant : lecture audio + sous-titres synchronisés
+@enduml

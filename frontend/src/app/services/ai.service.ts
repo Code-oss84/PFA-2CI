@@ -30,15 +30,6 @@ export class AiService {
     return this.api.post<{ answer: string }>('/ai/ask', { question });
   }
 
-  // === SYNTHÈSE VOCALE (LE TEAM/LE PROFESSEUR LIT LE TEXTE) ===
-  // Convertit un texte en audio MP3 via Edge TTS
-  // @param text : le texte à lire
-  // @param voice : (optionnel) la voix, ex. 'fr-FR-DeniseNeural'
-  // @returns : chemin de l'audio généré (ex. '/uploads/tts/xxx.mp3')
-  speak(text: string, voice?: string): Observable<{ audioPath: string; audioUrl: string }> {
-    return this.api.post<{ audioPath: string; audioUrl: string }>('/ai/speak', { text, voice });
-  }
-
   // === SYNTHÈSE VOCALE PAR PHRASES (SOUS-TITRES FILM) ===
   // Génère UN MP3 par phrase pour une lecture séquentielle avec
   // des sous-titres exactement synchronisés au son.

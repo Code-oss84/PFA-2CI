@@ -40,12 +40,6 @@ class Conversation {
     return rows[0];
   }
 
-  // Récupère le nombre total de conversations
-  static async count() {
-    const { rows } = await pool.query('SELECT COUNT(*) as count FROM conversations');
-    return parseInt(rows[0].count);
-  }
-
   // Supprime une conversation
   static async delete(id) {
     const { rows } = await pool.query(

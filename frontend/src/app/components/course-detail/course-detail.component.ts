@@ -45,13 +45,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   explaining = false;
   // Message affiché pendant la préparation du cours
   loadingMessage = '';
-  // Erreur d'explication
-  explainError = '';
   // === SYNTHÈSE VOCALE (le texte IA est lu à haute voix) ===
-  // Audio de l'explication généré
-  aiExplanationAudio = '';
-  // Audio de la réponse à la question
-  aiAnswerAudio = '';
   // Lecture en cours
   speaking = false;
   // Référence au lecteur audio courant
@@ -86,8 +80,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   aiAnswer = '';
   // Indicateur de réponse en cours
   asking = false;
-  // Erreur de question
-  askError = '';
 
   // === MICRO / RECONNAISSANCE VOCALE ===
   // Enregistre si le micro est en cours d'écoute
@@ -198,12 +190,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   resetAI(): void {
     this.aiExplanation = '';
     this.aiAnswer = '';
-    this.aiExplanationAudio = '';
-    this.aiAnswerAudio = '';
     this.question = '';
     this.recognizedText = '';
-    this.explainError = '';
-    this.askError = '';
     this.stopAudio();
     this.stopRecording();
   }
@@ -215,9 +203,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     if (!this.currentLesson) return;
 
     this.explaining = true;
-    this.explainError = '';
     this.aiExplanation = '';
-    this.aiExplanationAudio = '';
 
     // Message de chargement phase 1 : le professeur réfléchit (LLM local)
     this.loadingMessage = 'Le professeur prépare votre leçon...';
@@ -236,7 +222,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         this.explaining = false;
       },
       error: (err: any) => {
-        this.explainError = err.message || 'Erreur lors de l\'explication';
+        console.error('Erreur explication:', err);
         this.explaining = false;
       }
     });
@@ -251,9 +237,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     if (!q || this.asking) return;
 
     this.asking = true;
-    this.askError = '';
     this.aiAnswer = '';
-    this.aiAnswerAudio = '';
     this.question = '';
 
     this.aiService.askQuestion(q).subscribe({
@@ -265,7 +249,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         this.speakText(res.answer, () => this.resumeExplanationAfterAnswer());
       },
       error: (err: any) => {
-        this.askError = err.message || 'Erreur lors de la réponse';
+        console.error('Erreur réponse IA:', err);
         this.asking = false;
         // En cas d'erreur, reprend l'explication quand même
         this.resumeExplanationAfterAnswer();
@@ -290,11 +274,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
       this.aiExplanation = saved; // Restaure l'explication pour les sous-titres
       this.speakText(remaining);
     }
-  }
-
-  // Utilise le texte reconnu comme question
-  useRecognizedText(): void {
-    this.question = this.recognizedText;
   }
 
   // ---------- SYNTHÈSE VOCALE (le professeur lit le texte) ----------
@@ -509,65 +488,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     synth.speak(utterance);
   }
 
-  // Provoque la génération audio via le backend Edge TTS (secours)
-// Génère et joue l'audio via le backend Edge TTS (voix naturelles).
-  // En cas d'échec backend, se replie sur la synthèse locale du navigateur.
-  // Le texte est nettoyé du markdown (**, **, etc.) avant synthèse.
-  private synthesizeBackend(text: string): void {
-    const cleanText = this.prepareForSpeech(text);
-    this.currentSpeakText = cleanText;
-    this.speaking = true;
-    this.aiService.speak(cleanText).subscribe({
-      next: (res) => {
-        this.speaking = false;
-        this.playAudioBackend(res.audioPath);
-      },
-      error: (err: any) => {
-        this.speaking = false;
-        console.error('Erreur synthèse vocale backend:', err.message);
-        // Repli : synthèse locale du navigateur si le backend échoue
-        if (this.speechSynthSupported) {
-          this.speakWithSpeechSynthesis(cleanText);
-        }
-      }
-    });
-  }
-
-  // Lit un fichier audio généré par le backend (secours).
-  // Synchronise les sous-titres au timing réel de la lecture audio.
-  playAudioBackend(url: string): void {
-    if (!url) return;
-    if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
-    }
-    const audio = new Audio(url);
-    this.currentAudio = audio;
-
-    // Prépare le découpage en phrases pour les sous-titres synchronisés
-    this.subtitles = this.splitIntoSentences(this.prepareForSpeech(this.currentSpeakText));
-    this.activeSubtitleIndex = -1;
-
-    // met à jour le sous-titre actif selon la progression de l'audio
-    audio.addEventListener('timeupdate', () => {
-      const duration = audio.duration || 0;
-      if (duration > 0 && this.subtitles.length > 0) {
-        const progress = audio.currentTime / duration; // 0..1
-        // Découpe proportionnelle : la phrase dont la tranche contient la progression
-        const idx = Math.floor(progress * this.subtitles.length);
-        this.activeSubtitleIndex = Math.min(Math.max(idx, 0), this.subtitles.length - 1);
-        this.speaking = true;
-      }
-    });
-
-    audio.addEventListener('ended', () => {
-      this.speaking = false;
-      this.activeSubtitleIndex = -1;
-    });
-
-    audio.play().catch(() => {});
-  }
-
   // Arrête la synthèse vocale locale en cours
   stopSpeaking(): void {
     if (this.speechSynthSupported && window.speechSynthesis.speaking) {
@@ -600,7 +520,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   async startRecording(): Promise<void> {
     // Reset de l'état précédent
     this.recognizedText = '';
-    this.askError = '';
 
     // 1. Privilégie la reconnaissance vocale LOCALE (Web Speech API)
     //    → 100% navigateur, en français, gratuit, pas de blocage réseau
@@ -611,7 +530,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
     // 2. Sinon, bascule sur l'enregistrement + backend Whisper (secours)
     if (!this.micSupported) {
-      this.askError = 'Votre navigateur ne supporte ni la reconnaissance vocale ni le micro';
       return;
     }
 
@@ -641,7 +559,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
       this.mediaRecorder.start();
       this.isRecording = true;
     } catch (err: any) {
-      this.askError = 'Impossible d\'accéder au micro : ' + (err.message || 'autorisation refusée');
+      console.error('Impossible d\'accéder au micro :', err.message || err);
     }
   }
 
@@ -689,21 +607,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     };
 
     // Gestion des erreurs
-    recognition.onerror = (event: any) => {
+    recognition.onerror = () => {
       this.stopRecording();
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        this.askError = 'Accès au micro refusé. Autorisez le micro dans votre navigateur.';
-        this.resumeExplanationAfterAnswer();
-      } else if (event.error === 'no-speech') {
-        this.askError = 'Aucune parole détectée. Réessayez en parlant plus fort.';
-        this.resumeExplanationAfterAnswer();
-      } else if (event.error === 'aborted') {
-        // L'utilisateur a annulé → reprend l'explication
-        this.resumeExplanationAfterAnswer();
-      } else {
-        this.askError = 'Erreur de reconnaissance vocale : ' + event.error;
-        this.resumeExplanationAfterAnswer();
-      }
+      this.resumeExplanationAfterAnswer();
     };
 
     // Lance l'écoute
@@ -714,7 +620,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   // Secours : lance l'enregistrement via MediaRecorder + backend Whisper
   private async startRecordingWithMediaRecorder(): Promise<void> {
     if (!this.micSupported) {
-      this.askError = 'Votre navigateur ne supporte pas l\'enregistrement vocal';
       return;
     }
 
@@ -737,7 +642,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
       this.mediaRecorder.start();
       this.isRecording = true;
     } catch (err: any) {
-      this.askError = 'Impossible d\'accéder au micro : ' + (err.message || 'autorisation refusée');
+      console.error('Impossible d\'accéder au micro :', err.message || err);
     }
   }
 
@@ -788,7 +693,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     if (!this.audioBlob) return;
 
     this.transcribing = true;
-    this.askError = '';
 
     this.aiService.transcribeAudio(this.audioBlob).subscribe({
       next: (res) => {
@@ -802,7 +706,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         }
       },
       error: (err: any) => {
-        this.askError = err.message || 'Erreur lors de la transcription vocale';
+        console.error('Erreur transcription vocale:', err);
         this.transcribing = false;
       }
     });

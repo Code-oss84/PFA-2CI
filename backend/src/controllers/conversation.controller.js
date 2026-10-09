@@ -6,7 +6,6 @@
 
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
-const Avatar = require('../models/Avatar');
 const groqService = require('../services/groq.service');
 const ttsService = require('../services/tts.service');
 

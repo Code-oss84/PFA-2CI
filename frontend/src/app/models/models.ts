@@ -66,33 +66,3 @@ export interface Message {
   media_url?: string;
   created_at?: string;
 }
-
-// Modèle Progress
-export interface Progress {
-  id: number;
-  user_id: number;
-  course_id: number;
-  lesson_id: number;
-  completed: boolean;
-  score?: number;
-  completed_at?: string;
-}
-
-// Statistiques
-export interface Stats {
-  users?: number;
-  courses?: number;
-  avatars?: number;
-  conversations: number;
-  messages: number;
-  completedLessons?: number;
-  coursesStarted?: number;
-}
-
-// Réponse API standardisée
-export interface ApiResponse<T> {
-  data?: T;
-  message?: string;
-  error?: string;
-  [key: string]: any;
-}

@@ -1,0 +1,39 @@
+@startuml architecture-composants
+skinparam componentStyle rectangle
+package "Frontend (Angular)" {
+  [LoginComponent]
+  [DashboardComponent]
+  [CourseDetailComponent]
+  [ChatComponent]
+  [AdminComponent]
+  [AvatarComponent]
+  [AuthService]
+  [ApiService]
+}
+package "Backend (Node.js / Express)" {
+  [Routes REST]
+  [Middleware Auth JWT]
+  [Controllers]
+  [Services IA]
+  [Models]
+}
+database "PostgreSQL" as DB
+folder "uploads\n(avatars / tts / videos)" as FS
+cloud "Services IA externes" {
+  [Groq LLM]
+  [Whisper]
+  [Edge TTS]
+  [SadTalker]
+}
+[ApiService] --> [Routes REST] : HTTP / REST
+[Routes REST] --> [Middleware Auth JWT]
+[Routes REST] --> [Controllers]
+[Controllers] --> [Services IA]
+[Controllers] --> [Models]
+[Models] --> DB
+[Controllers] --> FS
+[Services IA] --> [Groq LLM]
+[Services IA] --> [Whisper]
+[Services IA] --> [Edge TTS]
+[Services IA] --> [SadTalker]
+@enduml

@@ -22,8 +22,6 @@ import { AuthService } from './auth.service';
 export class ApiService {
   // URL de base de l'API
   private baseUrl = environment.apiUrl;
-  // URL des fichiers uploadés
-  public uploadUrl = environment.uploadUrl;
 
   constructor(
     private http: HttpClient,

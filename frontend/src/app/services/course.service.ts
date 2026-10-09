@@ -30,29 +30,9 @@ export class CourseService {
     return this.api.post('/courses', data);
   }
 
-  // === METTRE À JOUR UN COURS (admin) ===
-  updateCourse(id: number, data: Partial<Course>): Observable<any> {
-    return this.api.put(`/courses/${id}`, data);
-  }
-
   // === SUPPRIMER UN COURS (admin) ===
   deleteCourse(id: number): Observable<any> {
     return this.api.delete(`/courses/${id}`);
-  }
-
-  // === CRÉER UNE LEÇON (admin) ===
-  createLesson(courseId: number, data: Partial<Lesson>): Observable<any> {
-    return this.api.post(`/courses/${courseId}/lessons`, data);
-  }
-
-  // === METTRE À JOUR UNE LEÇON (admin) ===
-  updateLesson(id: number, data: Partial<Lesson>): Observable<any> {
-    return this.api.put(`/lessons/${id}`, data);
-  }
-
-  // === SUPPRIMER UNE LEÇON (admin) ===
-  deleteLesson(id: number): Observable<any> {
-    return this.api.delete(`/lessons/${id}`);
   }
 
   // === MARQUER UNE LEÇON COMME TERMINÉE (user) ===

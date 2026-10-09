@@ -1,0 +1,25 @@
+@startuml deploiement
+node "Poste client" {
+  node "Navigateur web" as B
+}
+node "Serveur hôte (Docker)" {
+  node "Conteneur nginx\nFrontend Angular" as NG
+  node "Conteneur Node.js\nBackend Express :3000" as BE
+  database "Conteneur PostgreSQL\ndb :5432" as DB
+  folder "uploads" as UP
+}
+cloud "Services IA externes (gratuits)" {
+  node "Groq\nLLM / Whisper" as G
+  node "Hugging Face\nWhisper" as HF
+  node "Microsoft\nEdge TTS" as E
+  node "SadTalker\nColab + ngrok" as S
+}
+B --> NG : HTTPS
+NG --> BE : /api  /uploads
+BE --> DB : SQL (5432)
+BE --> UP : lecture / écriture
+BE --> G : HTTPS
+BE --> HF : HTTPS
+BE --> E : WSS
+BE --> S : HTTPS (ngrok)
+@enduml

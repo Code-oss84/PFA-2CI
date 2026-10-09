@@ -25,12 +25,6 @@ class Message {
     );
     return rows;
   }
-
-  // Récupère le nombre total de messages (pour stats)
-  static async count() {
-    const { rows } = await pool.query('SELECT COUNT(*) as count FROM messages');
-    return parseInt(rows[0].count);
-  }
 }
 
 module.exports = Message;

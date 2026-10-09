@@ -1,0 +1,19 @@
+@startuml activite-authentification
+start
+:Ouvrir l'application;
+:Saisir email et mot de passe;
+if (Identifiants valides ?) then (oui)
+  :Générer un token JWT;
+  :Stocker le token côté client;
+  if (Rôle = administrateur ?) then (oui)
+    :Accéder au tableau de bord admin;
+  else (non)
+    :Accéder à l'espace apprenant;
+  endif
+  :Utiliser les fonctionnalités;
+else (non)
+  :Afficher un message d'erreur;
+  stop
+endif
+stop
+@enduml

@@ -66,11 +66,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Calcule le pourcentage de progression d'un cours
-  getProgress(course: Course): number {
-    return course.progress || 0;
-  }
-
   // Navigue vers les cours
   goToCourses(): void {
     this.router.navigate(['/courses']);

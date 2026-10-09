@@ -20,33 +20,6 @@ class Progress {
     return rows[0];
   }
 
-  // Récupère la progression d'un utilisateur pour un cours
-  static async getCourseProgress(user_id, course_id) {
-    const { rows } = await pool.query(
-      `SELECT p.*, l.title as lesson_title
-       FROM progress p
-       JOIN lessons l ON l.id = p.lesson_id
-       WHERE p.user_id = $1 AND p.course_id = $2
-       ORDER BY l.order_index ASC`,
-      [user_id, course_id]
-    );
-    return rows;
-  }
-
-  // Récupère toute la progression d'un utilisateur
-  static async findByUser(user_id) {
-    const { rows } = await pool.query(
-      `SELECT p.*, c.title as course_title, l.title as lesson_title
-       FROM progress p
-       JOIN courses c ON c.id = p.course_id
-       JOIN lessons l ON l.id = p.lesson_id
-       WHERE p.user_id = $1 AND p.completed = true
-       ORDER BY p.completed_at DESC`,
-      [user_id]
-    );
-    return rows;
-  }
-
   // Calcule le pourcentage de progression d'un cours
   static async getPercentage(user_id, course_id) {
     const lessons = await pool.query(

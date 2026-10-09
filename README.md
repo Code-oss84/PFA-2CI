@@ -33,8 +33,8 @@
 
 | Service | Rôle | Endpoint | Clé API |
 |---------|------|----------|---------|
-| **Groq** | LLM pour les réponses intelligentes (`llama-3.1-70b`) | `api.groq.com` | Oui (gratuite) |
-| **Hugging Face** | Whisper pour la reconnaissance vocale | `api-inference.huggingface.co` | Oui (gratuite) |
+| **Groq** | LLM des réponses pédagogiques + Whisper (reconnaissance vocale) | `api.groq.com` | Oui (gratuite) |
+| **Hugging Face** | Whisper en secours (reconnaissance vocale) | `api-inference.huggingface.co` | Oui (gratuite) |
 | **Edge TTS** | Synthèse vocale (français) | `speech.platform.bing.com` | **Non nécessaire** |
 | **SadTalker** (Colab) | Génération d'avatar parlant | ngrok URL | ngrok token |
 
@@ -67,8 +67,136 @@ eduvatar-pfa/
 │   └── Dockerfile
 │
 ├── colab-scripts/            # Scripts SadTalker + ngrok
+├── captures/                 # Captures d'écran de l'application
+│   └── uml/                  # Diagrammes UML (sources .puml + PNG)
+├── Rapport_PFA_EduAvatar.docx # Rapport académique du projet
 ├── docker-compose.yml
 └── .env.example
+```
+
+---
+
+## 📸 Aperçu de l'application (captures d'écran)
+
+### Interfaces apprenant
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/login%20page.png" width="100%" alt="Page de connexion"><br>
+      <b>Figure 1 — Page de connexion</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/user-page.png" width="100%" alt="Tableau de bord apprenant"><br>
+      <b>Figure 2 — Tableau de bord de l'apprenant</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/user%20cours.png" width="100%" alt="Liste des cours"><br>
+      <b>Figure 3 — Liste des cours</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/user%20admin%20page%20cours%20details.png" width="100%" alt="Détail d'un cours"><br>
+      <b>Figure 4 — Détail d'un cours et de ses leçons</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/user%20page%20ai%20presentation%20cours%20chat%20meet.png" width="100%" alt="Explication IA"><br>
+      <b>Figure 5 — Explication d'une leçon par l'IA</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/user%20chat-ai.png" width="100%" alt="Chat avec l'avatar"><br>
+      <b>Figure 6 — Chat avec l'avatar pédagogique</b>
+    </td>
+  </tr>
+</table>
+
+### Interfaces administrateur
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/admin%20page%20home.png" width="100%" alt="Tableau de bord admin"><br>
+      <b>Figure 7 — Tableau de bord administrateur</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/admin%20page%20add%20new%20cours.png" width="100%" alt="Ajout d'un cours"><br>
+      <b>Figure 8 — Ajout d'un nouveau cours</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/admin%20page%20users%20listes.png" width="100%" alt="Gestion des utilisateurs"><br>
+      <b>Figure 9 — Gestion des utilisateurs</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/admin%20page%20statisque%20page.png" width="100%" alt="Statistiques"><br>
+      <b>Figure 10 — Page des statistiques</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/admin%20page%20creation%20de%20avatar.png" width="100%" alt="Création d'avatar"><br>
+      <b>Figure 11 — Création et génération d'un avatar parlant</b>
+    </td>
+    <td align="center" width="50%">
+      <i>Les figures sont également intégrées au rapport académique
+      (<code>Rapport_PFA_EduAvatar.docx</code>, section 4.11).</i>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🧩 Diagrammes UML
+
+Les diagrammes ont été générés avec **PlantUML** (sources éditables dans `captures/uml/*.puml`).
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/uml/cas-utilisation.png" width="100%" alt="Cas d'utilisation"><br>
+      <b>Cas d'utilisation</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/uml/architecture-composants.png" width="100%" alt="Architecture en composants"><br>
+      <b>Architecture en composants</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/uml/diagramme-classes.png" width="100%" alt="Diagramme de classes"><br>
+      <b>Diagramme de classes</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/uml/activite-authentification.png" width="100%" alt="Diagramme d'activité"><br>
+      <b>Diagramme d'activité (authentification)</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/uml/sequence-question-vocale.png" width="100%" alt="Séquence question vocale"><br>
+      <b>Séquence — question vocale et réponse parlée</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="captures/uml/sequence-avatar-parlant.png" width="100%" alt="Séquence avatar parlant"><br>
+      <b>Séquence — génération d'un avatar parlant</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="captures/uml/deploiement.png" width="100%" alt="Diagramme de déploiement"><br>
+      <b>Diagramme de déploiement</b>
+    </td>
+    <td align="center" width="50%"></td>
+  </tr>
+</table>
+
+Pour régénérer les diagrammes :
+```bash
+java -jar plantuml.jar -tpng -charset UTF-8 "captures/uml/*.puml"
 ```
 
 ---
@@ -164,7 +292,7 @@ docker-compose down -v       # Arrête ET supprime les données
 - Connectez-vous
 - Créez une conversation sur `/chat`
 - Envoyez un message → le backend appelle Groq pour répondre
-- (Si Edges TTS est configuré, un bouton "Écouter" apparaît)
+- (Un bouton "Écouter" déclenche la synthèse vocale Edge TTS, sans clé API)
 
 ### 7. Dashboard statistiques
 - `/dashboard` : statistiques personnelles
@@ -179,7 +307,7 @@ docker-compose down -v       # Arrête ET supprime les données
 1. Créez un compte gratuit : https://console.groq.com
 2. Générez une clé API
 3. Ajoutez-la dans le `.env` : `GROQ_API_KEY=votre-cle`
-4. Le backend utilise automatiquement le modèle `llama-3.1-70b-versatile`
+4. Le backend utilise le modèle défini par `GROQ_MODEL` (par défaut `llama-3.3-70b-versatile`)
 
 **Test** : `curl -X POST http://localhost:3000/api/health`
 
@@ -265,8 +393,15 @@ npm run seed           # Crée les données de démo
 | GET | `/api/conversations` | Mes conversations | Connecté |
 | GET | `/api/conversations/:id` | Détail + messages | Connecté |
 | POST | `/api/conversations/:id/messages` | Envoyer un message (LLM) | Connecté |
+| DELETE | `/api/conversations/:id` | Supprimer une conversation | Connecté |
+| POST | `/api/ai/explain` | Explication IA d'une leçon | Connecté |
+| POST | `/api/ai/ask` | Poser une question à l'IA | Connecté |
+| POST | `/api/ai/speak` | Synthèse vocale (TTS) | Connecté |
+| POST | `/api/ai/speak-sentences` | TTS phrase par phrase (sous-titres) | Connecté |
+| POST | `/api/ai/transcribe` | Reconnaissance vocale (Whisper) | Connecté |
 | GET | `/api/stats` | Statistiques globales | Admin |
 | GET | `/api/stats/user` | Stats personnelles | Connecté |
+| GET | `/api/stats/by-course` | Statistiques par cours | Admin |
 
 ---
 

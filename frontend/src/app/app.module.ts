@@ -12,26 +12,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDialogModule } from '@angular/material/dialog';
 
 // Lucide Icons
 import { LucideAngularModule } from 'lucide-angular';
 import {
   ArrowLeft, Volume2, Mic, MicOff, Square, Check, CheckCircle,
-  RefreshCw, Play, Send, Bot, MessageSquare, Lightbulb, X, List,
-  ChevronRight, Clock, ArrowRight, Users, BookOpen, GraduationCap,
-  Loader, CircleDot, CircleStop, Search, ChevronLeft
+  Play, List, ChevronRight, BookOpen, Loader, ChevronLeft
 } from 'lucide-angular';
 
 // Routing et modules
@@ -73,23 +61,11 @@ import { NavbarComponent } from './components/navbar/navbar.component';
     BrowserAnimationsModule,
     // Angular Material modules
     MatButtonModule,
-    MatCardModule,
-    MatInputModule,
-    MatFormFieldModule,
     MatIconModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatListModule,
     MatMenuModule,
-    MatTableModule,
-    MatProgressBarModule,
-    MatChipsModule,
-    MatDialogModule,
     LucideAngularModule.pick({
       ArrowLeft, Volume2, Mic, MicOff, Square, Check, CheckCircle,
-      RefreshCw, Play, Send, Bot, MessageSquare, Lightbulb, X, List,
-      ChevronRight, Clock, ArrowRight, Users, BookOpen, GraduationCap,
-      Loader, CircleDot, CircleStop, Search, ChevronLeft
+      Play, List, ChevronRight, BookOpen, Loader, ChevronLeft
     })
   ],
   providers: [],

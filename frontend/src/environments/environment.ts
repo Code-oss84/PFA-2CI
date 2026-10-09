@@ -8,7 +8,5 @@
 export const environment = {
   production: false,
   // URL de l'API backend (relative → redirigée par le proxy ng serve)
-  apiUrl: '/api',
-  // URL de base pour les fichiers uploadés (relative → proxy)
-  uploadUrl: '/uploads'
+  apiUrl: '/api'
 };

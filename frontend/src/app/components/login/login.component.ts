@@ -49,7 +49,7 @@ export class LoginComponent {
     try {
       const { email, password } = this.loginForm.value;
       // Appelle le service de connexion
-      const response: any = await this.authService.login(email, password).toPromise();
+      await this.authService.login(email, password).toPromise();
       // Redirige vers le dashboard
       this.router.navigate(['/dashboard']);
     } catch (err: any) {

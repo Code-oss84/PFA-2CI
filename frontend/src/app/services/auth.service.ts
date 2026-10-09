@@ -92,10 +92,4 @@ export class AuthService {
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);
   }
-
-  // === RÉCUPÉRER LE PROFIL DEPUIS LE SERVEUR ===
-  getProfile(): Observable<User> {
-    return this.http.get<any>(`${this.apiUrl}/me`)
-      .pipe(map((response) => response.user));
-  }
 }

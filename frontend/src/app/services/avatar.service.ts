@@ -29,11 +29,6 @@ export class AvatarService {
     return this.api.upload('/avatars', formData);
   }
 
-  // === RÉCUPÉRER UN AVATAR ===
-  getAvatar(id: number): Observable<{ avatar: Avatar }> {
-    return this.api.get<{ avatar: Avatar }>(`/avatars/${id}`);
-  }
-
   // === GÉNÉRER LA VIDÉO PARLANTE ===
   generateVideo(id: number, text: string): Observable<any> {
     return this.api.post(`/avatars/${id}/generate`, { text });

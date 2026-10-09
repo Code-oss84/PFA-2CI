@@ -5,7 +5,7 @@
 // et peut afficher l'avatar en vidéo
 // ============================================
 
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ConversationService } from '../../services/conversation.service';
 import { AvatarService } from '../../services/avatar.service';
@@ -16,7 +16,7 @@ import { Conversation, Message, Avatar } from '../../models/models';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit {
   // Référence au conteneur des messages pour le scroll automatique
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
 
@@ -36,10 +36,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   useVoice = true;
   // Envoi en cours
   sending = false;
-  // Chargement
-  loading = true;
-  // Erreur
-  errorMessage = '';
 
   constructor(
     private conversationService: ConversationService,
@@ -50,10 +46,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadConversations();
     this.loadAvatars();
-  }
-
-  ngOnDestroy(): void {
-    // Nettoyage éventuel (fermeture des connexions WebSocket, etc.)
   }
 
   // Charge les conversations de l'utilisateur
@@ -69,11 +61,9 @@ export class ChatComponent implements OnInit, OnDestroy {
             this.selectConversation(this.conversations[0].id);
           }
         });
-        this.loading = false;
       },
       error: (err: any) => {
-        this.errorMessage = err.message || 'Erreur lors du chargement des conversations';
-        this.loading = false;
+        console.error('Erreur chargement conversations:', err);
       }
     });
   }
@@ -100,12 +90,11 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.selectedAvatarId || undefined,
       'Nouvelle conversation'
     ).subscribe({
-      next: (res: any) => {
-        const conv = res.conversation;
+      next: () => {
         this.loadConversations();
       },
       error: (err: any) => {
-        this.errorMessage = err.message || 'Erreur lors de la création';
+        console.error('Erreur création conversation:', err);
       }
     });
   }
@@ -154,7 +143,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.sending = false;
       },
       error: (err: any) => {
-        this.errorMessage = err.message || 'Erreur lors de l\'envoi';
+        console.error('Erreur envoi message:', err);
         this.sending = false;
         this.scrollToBottom();
       }
@@ -169,11 +158,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       const audio = new Audio(mediaUrl);
       audio.play().catch(() => {});
     }
-  }
-
-  // Obtient l'URL d'un fichier média
-  getMediaUrl(path: string): string {
-    return path;
   }
 
   // Fait défiler vers le bas (dernier message)

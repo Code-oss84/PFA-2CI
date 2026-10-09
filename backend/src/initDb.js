@@ -82,15 +82,6 @@ const createTableQueries = [
     score INTEGER DEFAULT 0,
     completed_at TIMESTAMP,
     UNIQUE(user_id, lesson_id)
-  )`,
-
-  // Table Pictogram : pictogrammes ARASAAC pour communication alternative
-  `CREATE TABLE IF NOT EXISTS pictograms (
-    id SERIAL PRIMARY KEY,
-    keyword VARCHAR(100) NOT NULL,
-    image_url TEXT NOT NULL,
-    category VARCHAR(50),
-    created_at TIMESTAMP DEFAULT NOW()
   )`
 ];
 
