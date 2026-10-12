@@ -69,7 +69,7 @@ eduvatar-pfa/
 ├── colab-scripts/            # Scripts SadTalker + ngrok
 ├── captures/                 # Captures d'écran de l'application
 │   └── uml/                  # Diagrammes UML (sources .puml + PNG)
-├── Rapport_PFA_EduAvatar.docx # Rapport académique du projet
+├── Rapport_PFA_EduAvatar.pdf  # Rapport académique du projet
 ├── docker-compose.yml
 └── .env.example
 ```
@@ -143,7 +143,7 @@ eduvatar-pfa/
     </td>
     <td align="center" width="50%">
       <i>Les figures sont également intégrées au rapport académique
-      (<code>Rapport_PFA_EduAvatar.docx</code>, section 4.11).</i>
+      (<code>Rapport_PFA_EduAvatar.pdf</code>, section 4.11).</i>
     </td>
   </tr>
 </table>
