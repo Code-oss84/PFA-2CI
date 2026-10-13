@@ -69,7 +69,6 @@ eduvatar-pfa/
 ├── colab-scripts/            # Scripts SadTalker + ngrok
 ├── captures/                 # Captures d'écran de l'application
 │   └── uml/                  # Diagrammes UML (sources .puml + PNG)
-├── Rapport_PFA_EduAvatar.pdf  # Rapport académique du projet
 ├── docker-compose.yml
 └── .env.example
 ```
@@ -142,8 +141,7 @@ eduvatar-pfa/
       <b>Figure 11 — Création et génération d'un avatar parlant</b>
     </td>
     <td align="center" width="50%">
-      <i>Les figures sont également intégrées au rapport académique
-      (<code>Rapport_PFA_EduAvatar.pdf</code>, section 4.11).</i>
+      <i>Ces interfaces couvrent l'espace apprenant et l'espace administrateur.</i>
     </td>
   </tr>
 </table>
